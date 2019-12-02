@@ -9,6 +9,9 @@ int lastButtonState = LOW;
 unsigned long lastDebounceTime = 0;
 unsigned long debounceDelay = 50;
 
+int IN1 = 4;
+int IN2 = 7;
+
 //Função para ativar o motor DC
 int motordc(int a);
 
@@ -56,7 +59,7 @@ void loop()
     if (reading1 != buttonState)
     {
 
-      buttonState = reading;
+      buttonState = reading1;
 
       if (buttonState == HIGH)
       {
@@ -83,7 +86,7 @@ void loop()
     if (reading2 != buttonState)
     {
 
-      buttonState = reading;
+      buttonState = reading2;
 
       if (buttonState == HIGH)
       {
@@ -100,13 +103,14 @@ void loop()
   metro = 0;
 }
 
-int motordc(int a)
+int motordc(int a, int rotaciona)
 {
   
   Serial.println("Puxa a mola:");
   int tempo = a * 1000;
   delay(1000);
-  digitalWrite(motorDC, HIGH);
+  
+  
   Serial.println("motorservo");
   //Serial.println(digitalRead(motorDC));
   Serial.println(tempo);
@@ -116,28 +120,50 @@ int motordc(int a)
   motorserv(2);
   Serial.println("motorservo fim");
 
+  if(rotaciona == 1)
+  {
+      //Gira sentido horário
+      digitalWrite(IN1, HIGH);
+      digitalWrite(IN2, LOW);
+      delay(tempo);
+      //para o motor
+      digitalWrite(IN1, HIGH);
+      digitalWrite(IN2, HIGH);
+      motorserv(2);
+  }
+  if (rotaciona == 2)
+  {
+      //Gira sentido anti-horário
+      digitalWrite(IN1, LOW);
+      digitalWrite(IN2, HIGH);
+      delay(tempo);
+      //para o motor
+      digitalWrite(IN1, HIGH);
+      digitalWrite(IN2, HIGH);
+      delay(volta)
+  }
 }
 
 int motorserv(int b)
-{
-  
+{  
   serv.write(0);
 
   //Serial.println(b);
   if (b == 1)
   {
-    
+    //trava a alavanca
     delay(1000);
     Serial.println("Travou:");
-    serv.write(90);
-    motordc(metro);
+    serv.write(-20);
+    motordc(metro, 1);
     
   }
   if (b == 2)
-  {
-    
-    Serial.println("Solta a haste.");
-    serv.write(0);
+  {   
+    delay(1000);
+    serv.write(20);
+    delay(5000);
+    motordc(metro, 2);
     
   }
 }
